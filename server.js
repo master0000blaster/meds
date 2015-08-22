@@ -4,7 +4,6 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var dirName = "./Meds/public/";
 
-
 // set up a simple web server for testing
 var app = express();
 app.use(express.static(dirName));
