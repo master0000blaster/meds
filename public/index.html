@@ -11,45 +11,55 @@
 
     <div id="medTabs">
         <ul>
-            <li><a href="#medications">Medications</a></li>
-            <li><a href="#medicationDosages">Dosages</a></li>
             <li><a href="#administrations">Administrations</a></li>
+            <li><a href="#medications">Medications</a></li>
         </ul>
-        <div id="medications">
-            Medications
-            <div id="divAddMedication">
-                Medication Name: <input type="text" ng-model="addMedText" /><bt/>
-                <button ng-click="addMed()">Add</button>
-            </div>
-            <div id="medList">
-                <div ng-repeat="med in meds track by med._id">
-                    {{med.name}}<br />
-                    <hr />
-                </div>
-            </div>
-        </div>
-        <div id="medicationDosages">
-            Dosages
-            <div id="divAddMedicationDosages">
-               
-            </div>
-        </div>
         <div id="administrations">
             Administrations
             <div id="divAddAdministrations">
 
             </div>
         </div>
+        <div id="medications">
+            Medications
+            <div id="divAddMedication">
+                Medication Name: <input type="text" ng-model="addMedText" /><br />
+                <button ng-click="addMed()">Add</button>
+            </div>
+            <br />
+            <br />
+            <div id="medList">
+                <div ng-repeat="med in meds track by med._id">
+                    <button ng-click="ShowMedDosage(med._id)">Dosages</button>
+                    {{med.name}} <button style="float:right;" ng-click="deleteMed(med._id)">X</button>
+                    <div ng-show="medDosageShowing[med._id] != undefined && medDosageShowing[med._id] != null && medDosageShowing[med._id] != false">
+                        <ul style="list-style:none;">
+                            <li><button ng-show="addMedDosageShowing[med._id] == undefined || addMedDosageShowing[med._id] == null || addMedDosageShowing[med._id] == false" ng-click="addMedDosage(med._id)">Add Dosage</button></li>
+                            <li ng-show="addMedDosageShowing[med._id] != undefined && addMedDosageShowing[med._id] != null && addMedDosageShowing[med._id] != false">
+                                <input type="text" ng-model="addMedDosageText" />
+                                <button ng-click="addMedDosageDone(med._id)">Done</button>
+                                <button ng-click="addMedDosageCancel(med._id)">Cancel</button>
+                            </li>
+                        </ul>
+                        <table>
+                            <thead><tr><th>Dosage</th><th>Last Modified</th></tr></thead>
+                            <tbody ng-repeat="medDose in med.medDosaages track by medDose._id">
+
+                                <tr> <td>medDose.defaultDosage </td><td>medDose.lastModified</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <hr />
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="divOutput" >
+    <div id="divOutput">
         <div ng-repeat="line in outputLines track by $index">
             {{line}}<br />
         </div>
     </div>
-
-    test some stuff<br /><br />
-    <button ng-click="go()">go</button><br />
-
     <script type="text/javascript">
         $(document).ready(function () {
             $("#medTabs").tabs();
