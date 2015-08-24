@@ -1,8 +1,9 @@
 #!/bin/env node
-var dataSource = require("./Meds/Data/dataSource.js");
+var dataSource = require("./Entity/Data/datasource.js");
 var express = require('express');
 var bodyParser = require('body-parser');
-var dirName = "./Meds/public/";
+
+var dirName = "./public/";
 
 // set up a simple web server for testing
 var app = express();
@@ -62,7 +63,13 @@ app.post("/", function (request, res) {
             });
             
             sendingAsync = true;
-            result.data = action.apply(entity, args);
+            try {
+                result.data = action.apply(entity, args);
+            }
+            catch (err) {
+                sendingAsync = false;
+                result.errorMessage = "Error executing " + req.action + " on " + req.entity + ": " + err;
+            }
         }
     }
     

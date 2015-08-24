@@ -1,12 +1,59 @@
-﻿<html>
+﻿<html ng-app="medsApp">
 <head>
-    <script src="/scripts/jquery-2.1.4.min.js"></script>
-    <script src="/scripts/client.js"></script>
+    <link href="javascripts/jquery-ui-1.11.4.custom/jquery-ui.min.css" rel="stylesheet" />
+    <script src="javascripts/jquery-2.1.4.min.js"></script>
+    <script src="javascripts/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+    <script src="javascripts/angular.min.js"></script>
+    <script src="javascripts/medsApp.js"></script>
+    <script src="javascripts/controllers/mainController.js"></script>
 </head>
-<body>
-    test some stuff<br /><br />
-    <input type="button" value="go" id="btnGo" /><br />
-    <div id="divOutput"></div>
+<body ng-controller="mainController">
 
+    <div id="medTabs">
+        <ul>
+            <li><a href="#medications">Medications</a></li>
+            <li><a href="#medicationDosages">Dosages</a></li>
+            <li><a href="#administrations">Administrations</a></li>
+        </ul>
+        <div id="medications">
+            Medications
+            <div id="divAddMedication">
+                Medication Name: <input type="text" ng-model="addMedText" /><bt/>
+                <button ng-click="addMed()">Add</button>
+            </div>
+            <div id="medList">
+                <div ng-repeat="med in meds track by med._id">
+                    {{med.name}}<br />
+                    <hr />
+                </div>
+            </div>
+        </div>
+        <div id="medicationDosages">
+            Dosages
+            <div id="divAddMedicationDosages">
+               
+            </div>
+        </div>
+        <div id="administrations">
+            Administrations
+            <div id="divAddAdministrations">
+
+            </div>
+        </div>
+    </div>
+    <div id="divOutput" >
+        <div ng-repeat="line in outputLines track by $index">
+            {{line}}<br />
+        </div>
+    </div>
+
+    test some stuff<br /><br />
+    <button ng-click="go()">go</button><br />
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#medTabs").tabs();
+        });
+    </script>
 </body>
 </html>
