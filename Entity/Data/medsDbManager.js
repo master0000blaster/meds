@@ -23,7 +23,7 @@ var getDB = function (onComplete) {
                 db.on("close", function (error) {
                     medsDB = null;
                 });
-
+                
                 if (onComplete) {
                     onComplete(medsDB);
                 }
@@ -78,6 +78,34 @@ exports.getAdmnistrationsCollection = function (onComplete) {
     }
     else if (onComplete) {
         onComplete(admnistrationsCollection);
+    }
+};
+
+exports.find = function (collection, criteria, entityName, onComplete) {
+    if (onComplete) {
+        collection.find(criteria).toArray(function (err, result) {
+            var resultInfo = {
+                recordsFound : true,
+                errorMessage : "",
+                data : {}
+            };
+            
+            if (err) {
+                resultInfo.errorMessage = "Error in getting " + entityName + ": " + err;
+                consol.log("Error in " + functionName + ": ");
+                console.log(err);
+            } 
+            else if (result.length) {
+                resultInfo.data = result;
+            } 
+            else {
+                resultInfo.recordsFound = false;
+                resultInfo.errorMessage = "No " + entityName + " found.";
+            }
+            
+            onComplete(resultInfo);
+        
+        });
     }
 };
 
