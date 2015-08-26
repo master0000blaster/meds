@@ -10,13 +10,17 @@ var admnistrationsCollection;
 var getDB = function (onComplete) {
     if (!medsDB) {
         MongoClient.connect(dbConfig.address, function (err, db) {
+            var resultInfo = {
+                recordsFound : true,
+                errorMessage : "",
+                data : {}
+            };
+
             if (err) {
-                var msg = 'Unable to connect to the mongoDB server. Error: ';
-                console.log(msg, err);
-                var newError = new Error();
-                newError.message = msg + err;
-                
-                throw newError;
+                resultInfo.errorMessage = err.message;
+                if (onComplete) {
+                    onComplete(resultInfo);
+                }
             } else {
                 console.log('Connection established to', dbConfig.address);
                 medsDB = db;
@@ -40,9 +44,14 @@ exports.getDB = getDB;
 exports.getMedicationCollection = function (onComplete) {
     if (!medsCollection) {
         getDB(function (medsDB) {
-            medsCollection = medsDB.collection('Medication');
-            if (onComplete) {
-                onComplete(medsCollection);
+            if (medsDB.errorMessage) {
+                onComplete(medsDB);
+            }
+            else {
+                medsCollection = medsDB.collection('Medication');
+                if (onComplete) {
+                    onComplete(medsCollection);
+                }
             }
         });
     }
@@ -55,9 +64,14 @@ exports.getMedsDosagesCollection = function (onComplete) {
     
     if (!medsDosagesCollection) {
         getDB(function (medsDB) {
-            medsDosagesCollection = medsDB.collection('MedicationDosage');
-            if (onComplete) {
-                onComplete(medsDosagesCollection);
+            if (medsDB.errorMessage) {
+                onComplete(medsDB);
+            }
+            else {
+                medsDosagesCollection = medsDB.collection('MedicationDosage');
+                if (onComplete) {
+                    onComplete(medsDosagesCollection);
+                }
             }
         });
     }
@@ -70,10 +84,16 @@ exports.getAdmnistrationsCollection = function (onComplete) {
     
     if (!admnistrationsCollection) {
         getDB(function (medsDB) {
-            admnistrationsCollection = medsDB.collection('Administrations');
-            if (onComplete) {
-                onComplete(admnistrationsCollection);
+            if (medsDB.errorMessage) {
+                onComplete(medsDB);
             }
+            else {
+                admnistrationsCollection = medsDB.collection('Administrations');
+                if (onComplete) {
+                    onComplete(admnistrationsCollection);
+                }
+            }
+          
         });
     }
     else if (onComplete) {

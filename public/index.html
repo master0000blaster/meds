@@ -30,22 +30,29 @@
             <br />
             <div id="medList">
                 <div ng-repeat="med in meds track by med._id">
-                    <button ng-click="ShowMedDosage(med._id)">Dosages</button>
+                    <button ng-click="showMedDosage(med._id)">Dosages</button>
                     {{med.name}} <button style="float:right;" ng-click="deleteMed(med._id)">X</button>
                     <div ng-show="medDosageShowing[med._id] != undefined && medDosageShowing[med._id] != null && medDosageShowing[med._id] != false">
                         <ul style="list-style:none;">
                             <li><button ng-show="addMedDosageShowing[med._id] == undefined || addMedDosageShowing[med._id] == null || addMedDosageShowing[med._id] == false" ng-click="addMedDosage(med._id)">Add Dosage</button></li>
                             <li ng-show="addMedDosageShowing[med._id] != undefined && addMedDosageShowing[med._id] != null && addMedDosageShowing[med._id] != false">
-                                <input type="text" ng-model="addMedDosageText" />
+                                <input type="text" ng-model="addMedDosageText[med._id]" />
                                 <button ng-click="addMedDosageDone(med._id)">Done</button>
                                 <button ng-click="addMedDosageCancel(med._id)">Cancel</button>
                             </li>
+                            <li>
+                               
+                            </li>
                         </ul>
+                       <!--   <div ng-repeat="medDose in medDosages[med._id] track by medDose._id">
+                            foo
+                        </div>-->
+                      
                         <table>
                             <thead><tr><th>Dosage</th><th>Last Modified</th></tr></thead>
-                            <tbody ng-repeat="medDose in med.medDosaages track by medDose._id">
+                            <tbody ng-repeat="medDose in medDosages[med._id] track by medDose._id">
 
-                                <tr> <td>medDose.defaultDosage </td><td>medDose.lastModified</td></tr>
+                                <tr> <td>{{medDose.Dosage}} </td><td>{{medDose.DateModified}}</td></tr>
                             </tbody>
                         </table>
                     </div>

@@ -53,8 +53,9 @@ app.post("/", function (request, res) {
         
         if (action && entity) {
             var args = [];
-            for (var prop in req.params) {
-                args.push(req.params[prop]);
+            if (req.params)
+            {
+                args.push(req.params);
             }
             
             args.push(function (data) {
@@ -76,6 +77,11 @@ app.post("/", function (request, res) {
     if (!sendingAsync) {
         res.send(result);
     }
+});
+
+app.use(function (err, req, res, next) {
+    console.error(err);
+    res.status(500).send(err);
 });
 
 app.listen(8888);
