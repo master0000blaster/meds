@@ -26,6 +26,7 @@
     "body-parser": "^1.13.3",
     "body-parser-json": "^1.9.2",
     "express": "^3.21.2",
+    "moment": "^2.10.6",
     "mongodb": "^2.0.42"
   },
   "devDependencies": {},

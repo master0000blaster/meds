@@ -70,6 +70,7 @@ app.post("/", function (request, res) {
             catch (err) {
                 sendingAsync = false;
                 result.errorMessage = "Error executing " + req.action + " on " + req.entity + ": " + err;
+                console.log(result.errorMessage);
             }
         }
     }
