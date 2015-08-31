@@ -1,131 +1,121 @@
-﻿var mongodb = require('mongodb');
+﻿var pg = require('pg');
 var dbConfig = require('./../../config/dbConfig.js');
+var types = require('./Models/types.js');
 
-var MongoClient = mongodb.MongoClient;
-var medsDB;
-var medsCollection;
-var medsDosagesCollection;
-var admnistrationsCollection;
+var getClient = function (onComplete) {
+    var connectionString = process.env.DATABASE_URL || dbConfig.address;
+    
+    var client = new pg.Client(connectionString);
+    
+    pg.connect(conString, function (err, client, done) {
+        var resultInfo = {};
+        
+        if (err) {
+            if (onComplete) {
+                onComplete({ errorMessage : err.message });
+            }
+        } else {
+            //console.log('Connection established to Meds DB');
+            
+            if (onComplete) {
+                onComplete(client);
+            }
+        }
+    });
+};
 
-var getDB = function (onComplete) {
-    if (!medsDB) {
-        MongoClient.connect(dbConfig.address, function (err, db) {
-            var resultInfo = {
-                recordsFound : true,
-                errorMessage : "",
-                data : {}
-            };
+exports.getClient = getClient;
 
+exports.insertModel = function (modelBase) {
+
+    getClient(function (client) {
+        
+        var fields = "";
+        var values = "";
+        var model = modelBase.model;
+        var paramOrdinal = 1;
+        var params = [];
+        for (var fieldInfo in model) {
+            if (model.hasOwnProperty(fieldInfo)) {
+                if (!model[fieldInfo].isIdentity) {
+                    if (fields != "") {
+                        fields += ", ";
+                        values += ", ";
+                    }
+                    
+                    fields += fieldInfo;
+                    values += "$" + paramOrdinal;
+                    params.push(model[fieldInfo].value);
+
+                    paramOrdinal++;
+                }
+            }
+        }
+        
+        var queryText = 'INSERT INTO ' + model.tableName + ' (' + fields + ') VALUES (' + values + ')';
+
+        client.query(queryText, params, function (err, result) {
             if (err) {
-                resultInfo.errorMessage = err.message;
                 if (onComplete) {
-                    onComplete(resultInfo);
+                    onComplete({ errorMessage : err.message });
                 }
             } else {
-                console.log('Connection established to', dbConfig.address);
-                medsDB = db;
-                db.on("close", function (error) {
-                    medsDB = null;
-                });
-                
                 if (onComplete) {
-                    onComplete(medsDB);
+                    var newlyCreatedUserId = result.rows[0].id;
+                    onComplete({ newId : newlyCreatedUserId });
                 }
-            }
-        });
-    }
-    else if (onComplete) {
-        onComplete(medsDB);
-    }
-};
-
-exports.getDB = getDB;
-
-exports.getMedicationCollection = function (onComplete) {
-    if (!medsCollection) {
-        getDB(function (medsDB) {
-            if (medsDB.errorMessage) {
-                onComplete(medsDB);
-            }
-            else {
-                medsCollection = medsDB.collection('Medication');
-                if (onComplete) {
-                    onComplete(medsCollection);
-                }
-            }
-        });
-    }
-    else if (onComplete) {
-        onComplete(medsCollection);
-    }
-};
-
-exports.getMedsDosagesCollection = function (onComplete) {
-    
-    if (!medsDosagesCollection) {
-        getDB(function (medsDB) {
-            if (medsDB.errorMessage) {
-                onComplete(medsDB);
-            }
-            else {
-                medsDosagesCollection = medsDB.collection('MedicationDosage');
-                if (onComplete) {
-                    onComplete(medsDosagesCollection);
-                }
-            }
-        });
-    }
-    else if (onComplete) {
-        onComplete(medsDosagesCollection);
-    }
-};
-
-exports.getAdmnistrationsCollection = function (onComplete) {
-    
-    if (!admnistrationsCollection) {
-        getDB(function (medsDB) {
-            if (medsDB.errorMessage) {
-                onComplete(medsDB);
-            }
-            else {
-                admnistrationsCollection = medsDB.collection('Administrations');
-                if (onComplete) {
-                    onComplete(admnistrationsCollection);
-                }
-            }
-          
-        });
-    }
-    else if (onComplete) {
-        onComplete(admnistrationsCollection);
-    }
-};
-
-exports.find = function (collection, criteria, entityName, onComplete) {
-    if (onComplete) {
-        collection.find(criteria).toArray(function (err, result) {
-            var resultInfo = {
-                recordsFound : true,
-                errorMessage : "",
-                data : {}
-            };
-            
-            if (err) {
-                resultInfo.errorMessage = "Error in getting " + entityName + ": " + err;
-                consol.log("Error in " + functionName + ": ");
-                console.log(err);
-            } 
-            else if (result.length) {
-                resultInfo.data = result;
-            } 
-            else {
-                resultInfo.recordsFound = false;
-                resultInfo.errorMessage = "No " + entityName + " found.";
             }
             
-            onComplete(resultInfo);
+            client.end();
+        });
+    });
+};
+
+exports.updateById = function (modelBase) {
+    getClient(function (client) {
         
+        var fields = "";
+        var model = modelBase.model;
+        var paramOrdinal = 1;
+        var params = [];
+        var id = "";
+        var idFieldName = "";
+        for (var fieldInfo in model) {
+            if (model.hasOwnProperty(fieldInfo)) {
+                if (!model[fieldInfo].isIdentity) {
+                    if (fields != "") {
+                        fields += ", ";
+                        values += ", ";
+                    }
+                    
+                    fields += fieldInfo + " = $" + paramOrdinal;
+                    params.push(model[fieldInfo].value);
+                    
+                    paramOrdinal++;
+                }
+                else {
+                    id = model[fieldInfo].value;
+                    idFieldName = fieldInfo;
+                }
+            }
+        }
+        
+        var queryText = 'UPDATE ' + model.tableName + ' SET ' + fields + ' WHERE ' + idFieldName + ' = $' + paramOrdinal;
+        
+        params.push(id);
+        
+        client.query(queryText, params, function (err, result) {
+            if (err) {
+                if (onComplete) {
+                    onComplete({ errorMessage : err.message });
+                }
+            } else {                
+                if (onComplete) {
+                    onComplete({ });
+                }
+            }
+            
+            client.end();
         });
-    }
-};
-
+    });
+}

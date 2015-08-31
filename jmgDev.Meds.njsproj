@@ -46,6 +46,12 @@
     <Compile Include="Entity\Data\datasource.js" />
     <Compile Include="Entity\Data\medsDatabase.js" />
     <Compile Include="Entity\Data\medsDbManager.js" />
+    <Compile Include="Entity\Data\Models\administration.js" />
+    <Compile Include="Entity\Data\Models\fieldInfo.js" />
+    <Compile Include="Entity\Data\Models\medication.js" />
+    <Compile Include="Entity\Data\Models\medicationDosage.js" />
+    <Compile Include="Entity\Data\Models\modelBase.js" />
+    <Compile Include="Entity\Data\Models\types.js" />
     <Compile Include="Entity\Helpers\dateHelper.js" />
     <Compile Include="public\javascripts\angular.min.js" />
     <Compile Include="public\javascripts\Controllers\mainController.js" />
@@ -60,6 +66,7 @@
     <Folder Include="Entity\" />
     <Folder Include="Entity\Data\" />
     <Folder Include="config\" />
+    <Folder Include="Entity\Data\Models\" />
     <Folder Include="Entity\Helpers\" />
     <Folder Include="public\" />
     <Folder Include="public\css\" />
