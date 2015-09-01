@@ -9,7 +9,7 @@ function create() {
             id : fieldInfo.create(types.number, true),
             Dosage : fieldInfo.create(types.number),
             MedicationId : fieldInfo.create(types.number),
-            DateModified : fieldInfo.create(types.date)
+            DateModified : fieldInfo.create(types.date, false, true)
         }
     );
 }

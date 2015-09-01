@@ -11,7 +11,7 @@ function create() {
             MedicationDosageId : fieldInfo.create(types.number),
             DosageTaken : fieldInfo.create(types.number),
             TakenAt : fieldInfo.create(types.date),
-            DateModified : fieldInfo.create(types.date)
+            DateModified : fieldInfo.create(types.date, false, true)
         }
     );
 }

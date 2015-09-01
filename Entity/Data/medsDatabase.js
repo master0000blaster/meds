@@ -3,136 +3,48 @@ var dateHelper = require('./../Helpers/dateHelper.js');
 var medication = require('./Models/medication.js');
 var medicationDosage = require('./Models/medicationDosage.js');
 var administration = require('./Models/administration.js');
+var modelBase = require('./Models/modelBase.js');
 
-function GetResultInfo() {
-    return {
-        recordsFound : true,
-        errorMessage : "",
-        data : {}
-    };
-}
 //--------------------------------- actions
-exports.insertMedication = function (medication, onComplete) {
+exports.insertMedication = function (medicationFlat, onComplete) {
+    
+    var model = medication.create();
+    modelBase.fillFromFlat(model, medicationFlat);
 
-    medication.DateModified = dateHelper.getDateTimeNowString();
-    medsDbManager.getMedicationCollection(function (medsCollection) {
-        if (medsCollection.errorMessage) {
-            onComplete(medsDB);
-        }
-        else {
-            try {
-                medsCollection.insert(medication, function (err, result) {
-                    var resultInfo = GetResultInfo();
-                    if (err) {
-                        var msg = 'error in insertMedication. Error: ';
-                        console.log(msg);
-                        console.log(err);
-                        
-                        resultInfo.errorMessage = msg + err;
-                        
-                        if (onComplete) {
-                            onComplete(resultInfo);
-                        }
-                    } else {
-                        if (onComplete) {
-                            resultInfo.data = result;
-                            onComplete(resultInfo);
-                        }
-                    }
-                });
-            }
-            catch (err) {
-                console.log(err);
-                if (onComplete) {
-                    onComplete({ errorMessage : err.message });
-                }
-            }
+    medsDbManager.insertModel(model,function (result) {
+        if (onComplete) {
+            onComplete(result);
         }
     });
 };
 
 exports.getAllMeds = function (onComplete) {
-    medsDbManager.getMedicationCollection(function (medsCollection) {
-        if (medsCollection.errorMessage) {
-            onComplete(medsDB);
-        }
-        else {
-            try {
-                medsDbManager.find(medsCollection, {}, "Medications", function (resultInfo) {
-                    
-                    if (onComplete) {
-                        onComplete(resultInfo);
-                    }
-                });
-            }
-            catch (err) {
-                console.log(err);
-                if (onComplete) {
-                    onComplete({ errorMessage : err.message });
-                }
-            }
+    var medsModel = medication.create();
+
+    medsDbManager.getAll(medsModel, function (result) {
+        if (onComplete) {
+            onComplete(result);
         }
     });
 };
 
 exports.getMedDosagesByMedId = function (args, onComplete) {
-    medsDbManager.getMedsDosagesCollection(function (medsDosagesCollection) {
-        if (medsDosagesCollection.errorMessage) {
-            onComplete(medsDB);
-        }
-        else {
-            try {
-                medsDbManager.find(medsDosagesCollection, { MedicationId: args.medId }, "Dosages", function (resultInfo) {
-                    if (onComplete) {
-                        onComplete(resultInfo);
-                    }
-                });
-            }
-            catch (err) {
-                console.log(err);
-                if (onComplete) {
-                    onComplete({ errorMessage : err.message });
-                }
-            }
+    var medDosage = medicationDosage.create();
+    medDosage.id = args.medId;
+    medsDbManager.getById(medDosage, function (result) {
+        if (onComplete) {
+            onComplete(result);
         }
     });
 };
 
-exports.addMedDosagesByMedId = function (medDosage, onComplete) {
-    medsDbManager.getMedsDosagesCollection(function (medsDosagesCollection) {
-        if (medsDosagesCollection.errorMessage) {
-            onComplete(medsDB);
-        }
-        else {
-            try {
+exports.addMedDosages = function (medDosageFlat, onComplete) {
+    var model = medicationDosage.create();
+    modelBase.fillFromFlat(model, medDosageFlat);
 
-                medDosage.DateModified = dateHelper.getDateTimeNowString();;
-                medsDosagesCollection.insert(medDosage, function (err, result) {
-                    var resultInfo = GetResultInfo();
-                    if (err) {
-                        var msg = 'error in addMedDosagesByMedId. Error: ';
-                        console.log(msg);
-                        console.log(err);
-                        
-                        resultInfo.errorMessage = msg + err;
-                        
-                        if (onComplete) {
-                            onComplete(resultInfo);
-                        }
-                    } else {
-                        if (onComplete) {
-                            resultInfo.data = result;
-                            onComplete(resultInfo);
-                        }
-                    }
-                });
-            }
-            catch (err) {
-                console.log(err);
-                if (onComplete) {
-                    onComplete({ errorMessage : err.message });
-                }
-            }
+    medsDbManager.insertModel(model, function (result) {
+        if (onComplete) {
+            onComplete(result);
         }
     });
 };
