@@ -139,6 +139,7 @@ exports.updateById = function (modelBase, onComplete) {
         }
 
         var fields = "";
+        var values = "";
         var model = modelBase.model;
         var paramOrdinal = 1;
         var params = [];
@@ -166,7 +167,7 @@ exports.updateById = function (modelBase, onComplete) {
             }
         }
         
-        var queryText = 'UPDATE "' + modelBase.tableName + '" SET ' + fields + ' WHERE ' + idFieldName + ' = $' + paramOrdinal;
+        var queryText = 'UPDATE "' + modelBase.tableName + '" SET ' + fields + ' WHERE "' + idFieldName + '" = $' + paramOrdinal;
         
         params.push(id);
         
@@ -230,7 +231,7 @@ exports.getById = function (modelBase, onComplete) {
             }
         }
 
-        var queryText = 'SELECT  ' + fields + ' FROM "' + modelBase.tableName + '" WHERE ' + idFieldName + ' = $1';
+        var queryText = 'SELECT  ' + fields + ' FROM "' + modelBase.tableName + '" WHERE "' + idFieldName + '" = $1';
         var params = [model[idFieldName].value];
 
         client.query(queryText, params, function (err, result) {
@@ -249,6 +250,83 @@ exports.getById = function (modelBase, onComplete) {
         });
     });
 };
+
+exports.getByWhere = function(modelBase, whereClause, paramsArr, onComplete)
+{
+    getClient(function (client) {
+        
+        if (client.errorMessage) {
+            if (onComplete) {
+                onComplete(client);
+            }
+            return;
+        }
+        
+        var model = modelBase.model;
+
+        var fields = "";
+        
+        for (var fieldInfo in model) {
+            if (model.hasOwnProperty(fieldInfo)) {
+                if (fields != "") {
+                    fields += ", ";
+                }
+                
+                fields += '"' + fieldInfo + '"';
+            }
+        }
+        
+        var queryText = 'SELECT  ' + fields + ' FROM "' + modelBase.tableName + '" ' + whereClause;
+        var params = paramsArr;
+        
+        client.query(queryText, params, function (err, result) {
+            if (err) {
+                if (onComplete) {
+                    onComplete({ errorMessage : err.message });
+                }
+            } else {
+                if (onComplete) {
+                    var models = dataHelper.getModelsFromTable(modelBase, result.rows);
+                    onComplete(models);
+                }
+            }
+            
+            client.end();
+        });
+    });
+}
+
+exports.deleteByWhere = function (modelBase, whereClause, paramsArr, onComplete) {
+    getClient(function (client) {
+        
+        if (client.errorMessage) {
+            if (onComplete) {
+                onComplete(client);
+            }
+            return;
+        }
+        
+        var model = modelBase.model;
+        
+        var queryText = 'DELETE FROM "' + modelBase.tableName + '" ' + whereClause;
+        var params = paramsArr;
+        
+        client.query(queryText, params, function (err, result) {
+            if (err) {
+                if (onComplete) {
+                    onComplete({ errorMessage : err.message });
+                }
+            } else {
+                if (onComplete) {
+                    var models = dataHelper.getModelsFromTable(modelBase, result.rows);
+                    onComplete(models);
+                }
+            }
+            
+            client.end();
+        });
+    });
+}
 
 exports.getAll = function (modelBase, onComplete) {
 

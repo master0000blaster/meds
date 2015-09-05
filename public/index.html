@@ -31,14 +31,14 @@
             <div id="medList">
                 <div ng-repeat="med in meds track by med.id">
                     <button ng-click="showMedDosage(med.id)">Dosages</button>
-                    <span ng-show="!editModeMedicationEnabled[med.id]">{{med.Name}}</span><input ng-show="editModeMedicationEnabled[med.id]" type="text" ng-model="med.Name" />
-                    <button style="float:right;" ng-click="deleteMed(med.id)">X</button>
+                    <span ng-show="!editModeMedicationEnabled[med.id]">{{med.Name}} Date Modified: {{med.DateModified}}</span><input ng-show="editModeMedicationEnabled[med.id]" type="text" ng-model="med.Name" />
+                    <button style="float:right;" ng-click="deleteMed(med.id)">{{editModeMedicationEnabled[med.id] ? 'Cancel' : 'X'}}</button>
                     <button style="float:right;margin-right:15px;" ng-click="updateMed(med)">{{editModeMedicationEnabled[med.id] ? 'Update' : 'Edit'}}</button>
                     <div ng-show="medDosageShowing[med.id] != undefined && medDosageShowing[med.id] != null && medDosageShowing[med.id] != false">
                         <ul style="list-style:none;">
                             <li><button ng-show="addMedDosageShowing[med.id] == undefined || addMedDosageShowing[med.id] == null || addMedDosageShowing[med.id] == false" ng-click="addMedDosage(med.id)">Add Dosage</button></li>
                             <li ng-show="addMedDosageShowing[med.id] != undefined && addMedDosageShowing[med.id] != null && addMedDosageShowing[med.id] != false">
-                                <input type="text" ng-model="addMedDosageText[med.id]" />
+                                <input type="number" ng-model="addMedDosageText[med.id]" />
                                 <button ng-click="addMedDosageDone(med.id)">Done</button>
                                 <button ng-click="addMedDosageCancel(med.id)">Cancel</button>
                             </li>
@@ -48,9 +48,17 @@
                         </ul>
                         <table>
                             <thead><tr><th>Dosage</th><th>Last Modified</th></tr></thead>
-                            <tbody ng-repeat="medDose in medDosages[med._id] track by medDose._id">
+                            <tbody ng-repeat="medDose in medDosages[med.id] track by medDose.id">
 
-                                <tr> <td>{{medDose.Dosage}} </td><td>{{medDose.DateModified}}</td></tr>
+                                <tr>
+                                    <td style="padding:4px;">
+                                        <span ng-show="!medDoseUpdateModeEnabled[med.id][medDose.id]">{{medDose.Dosage}} </span>
+                                        <input type="number" ng-show="medDoseUpdateModeEnabled[med.id][medDose.id]" ng-model="medDose.Dosage"/>
+                                    </td>
+                                    <td style="padding:4px;">{{medDose.DateModified}}</td>
+                                    <td style="padding:4px;"><button style="float:right;" ng-click="updateMedDosge(medDose, med.id)">{{medDoseUpdateModeEnabled[med.id][medDose.id] ? 'Update' : 'Edit'}}</button></td>
+                                    <td style="padding:4px;"><button style="float:right;" ng-click="deleteMedDosage(medDose.id, med.id)">{{medDoseUpdateModeEnabled[med.id][medDose.id] ? 'Cancel' : 'X'}}</button></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

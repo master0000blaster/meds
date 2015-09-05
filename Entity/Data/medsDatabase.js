@@ -29,17 +29,30 @@ exports.getAllMeds = function (onComplete) {
 
 exports.getMedDosagesByMedId = function (args, onComplete) {
     var model = medicationDosage.create();
-    model.model.id.value = args.medId;
-    medsDbManager.getById(model, function (result) {
+    var whereClause = ' WHERE "MedicationId" = $1';
+    var params = [args.medId];
+    medsDbManager.getByWhere(model, whereClause, params,  function (result) {
+        if (onComplete) {
+            onComplete(result);
+        }
+    });
+};
+var deleteMedDosagesByMedId = function (args, onComplete) {
+    var model = medicationDosage.create();
+    var whereClause = ' WHERE "MedicationId" = $1';
+    var params = [args.medId];
+    medsDbManager.deleteByWhere(model, whereClause, params, function (result) {
         if (onComplete) {
             onComplete(result);
         }
     });
 };
 
-exports.addMedDosages = function (medDosageFlat, onComplete) {
+exports.deleteMedDosagesByMedId = deleteMedDosagesByMedId;
+
+exports.addMedDosage = function (medDosageFlat, onComplete) {
     var model = medicationDosage.create();
-    modelBase.fillFromFlat(modelBase, medDosageFlat);
+    modelBase.fillFromFlat(model, medDosageFlat);
 
     medsDbManager.insertModel(model, function (result) {
         if (onComplete) {
@@ -51,6 +64,25 @@ exports.addMedDosages = function (medDosageFlat, onComplete) {
 exports.deleteMedById = function (args, onComplete) {
     var model = medication.create();
     model.model.id.value = args.medId;
+    deleteMedDosagesByMedId(args, function (medDosgaeResult) {
+        if (!medDosgaeResult.errorMessage) {
+
+            medsDbManager.deleteById(model, function (result) {
+                if (onComplete) {
+                    onComplete(result);
+                }
+            });
+        } else {
+            if (onComplete) {
+                onComplete(medDosgaeResult);
+            }
+        }
+    });
+};
+
+exports.deleteDosageMedById = function (args, onComplete) {
+    var model = medicationDosage.create();
+    model.model.id.value = args.medDosageId;
     medsDbManager.deleteById(model, function (result) {
         if (onComplete) {
             onComplete(result);
@@ -61,6 +93,17 @@ exports.deleteMedById = function (args, onComplete) {
 exports.updateMedById = function (medFlat, onComplete) {
     var model = medication.create();
     modelBase.fillFromFlat(model, medFlat);
+
+    medsDbManager.updateById(model, function (result) {
+        if (onComplete) {
+            onComplete(result);
+        }
+    });
+};
+
+exports.updateMedDosage = function(medDosageFlat, onComplete) {
+    var model = medicationDosage.create();
+    modelBase.fillFromFlat(model, medDosageFlat);
     
     medsDbManager.updateById(model, function (result) {
         if (onComplete) {
