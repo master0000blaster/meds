@@ -1,13 +1,13 @@
 app.controller("mainController", function ($scope) {
     
     function createRequest() {
-      return {
+        return {
             entity : "",
             action : "",
             params : {}
         };
     }
-
+    
     $scope.outputLines = [];
     $scope.addMedText = "";
     $scope.meds = [];
@@ -17,6 +17,7 @@ app.controller("mainController", function ($scope) {
     $scope.addMedDosageText = {};
     $scope.medDosageLoadingShowing = {};
     $scope.medDosages = {};
+    $scope.editModeMedicationEnabled = {};
     
     function Output(text) {
         $scope.outputLines.push(text);
@@ -39,7 +40,7 @@ app.controller("mainController", function ($scope) {
                 }
                 else {
                     if (onComplete) {
-                        var data = result.data ? result.data : { };
+                        var data = result.data ? result.data : {};
                         onComplete(data);
                     }
                 }
@@ -47,13 +48,12 @@ app.controller("mainController", function ($scope) {
             },
             error: function (e) {
                 console.log(e);
-                onComplete({errorMessage : e.message});
+                onComplete({ errorMessage : e.message });
             }
         });
     }
     
-    function getMedDosagesByMedId(medId)
-    {
+    function getMedDosagesByMedId(medId) {
         var requestModel = createRequest();
         requestModel.entity = "meds";
         requestModel.action = "getMedDosagesByMedId";
@@ -62,7 +62,7 @@ app.controller("mainController", function ($scope) {
         };
         
         PostSomething(requestModel, function (results) {
-           
+            
             $scope.medDosageLoadingShowing[medId] = false;
             if (results.errorMessage) {
                 $scope.medDosages[medId] = {};
@@ -84,7 +84,7 @@ app.controller("mainController", function ($scope) {
             $scope.medDosageShowing[medId] = false;
             $scope.medDosageLoadingShowing[medId] = false;
         }
-
+        
         if ($scope.medDosageLoadingShowing[medId]) {
             getMedDosagesByMedId(medId);
         }
@@ -107,9 +107,9 @@ app.controller("mainController", function ($scope) {
             
             PostSomething(requestModel, function (data) {
                 getMedDosagesByMedId(medId);
-            });   
+            });
         }
-
+        
         $scope.addMedDosageText[medId] = "";
     
     };
@@ -119,20 +119,31 @@ app.controller("mainController", function ($scope) {
         $scope.addMedDosageText[medId] = "";
     
     };
-
+    
     $scope.addMed = function () {
         var requestModel = createRequest();
         requestModel.entity = "meds";
         requestModel.action = "insertMedication";
         requestModel.params = { name : $scope.addMedText };
         
-        PostSomething(requestModel, function (data) { 
+        PostSomething(requestModel, function (data) {
             getAllMeds();
-        });   
+        });
     };
     
-    $scope.deleteMed = function (_id) {
-
+    $scope.deleteMed = function (id) {
+        var requestModel = createRequest();
+        requestModel.entity = "meds";
+        requestModel.action = "deleteMedById";
+        requestModel.params = {
+            medId: id
+        };
+        
+        PostSomething(requestModel, function (results) {
+            if (!results.errorMessage) {
+                getAllMeds();
+            }
+        });
     };
     
     var getAllMeds = function () {
@@ -142,15 +153,51 @@ app.controller("mainController", function ($scope) {
         requestModel.params = {};
         
         PostSomething(requestModel, function (results) {
-            $scope.meds = results.data;
+            $scope.editModeMedicationEnabled = {};
+            for (var m = 0; m < results.length; m++) {
+                $scope.editModeMedicationEnabled[results[m].id] = false;
+            }
+            
+            $scope.meds = results;
             $scope.$apply();
         });
     };
-
+    
+    var updateMed = function (med, onComplete) {
+        var requestModel = createRequest();
+        requestModel.entity = "meds";
+        requestModel.action = "updateMedById";
+        requestModel.params = med;
+        
+        PostSomething(requestModel, function (results) {
+            if (results.errorMessage) {
+                console.log(results.errorMessage);
+            }
+            if (onComplete) {
+                onComplete(results);
+            }
+            
+            $scope.$apply();
+        });
+    };
+    
+    $scope.updateMed = function (med) {
+        if ($scope.editModeMedicationEnabled[med.id]) {
+            updateMed(med, function (result) {
+                if (!result.errorMessage) {
+                    $scope.editModeMedicationEnabled[med.id] = false;
+                }
+            });
+        }
+        else {
+            $scope.editModeMedicationEnabled[med.id] = true;
+        }
+    };
+    
     $scope.init = function () {
         getAllMeds();
     };
-
+    
     $scope.init();
 
 });

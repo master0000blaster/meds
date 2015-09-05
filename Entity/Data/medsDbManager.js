@@ -1,6 +1,7 @@
 ﻿var pg = require('pg');
 var dbConfig = require('./../../config/dbConfig.js');
 var types = require('./Models/types.js');
+var dataHelper = require('./../Helpers/dataHelper.js');
 
 var getClient = function (onComplete) {
     
@@ -77,6 +78,48 @@ exports.insertModel = function (modelBase, onComplete) {
                 if (onComplete) {
                     var newlyCreatedUserId = result.rows[0].id;
                     onComplete({ newId : newlyCreatedUserId });
+                }
+            }
+            
+            client.end();
+        });
+    });
+};
+
+exports.deleteById = function (modelBase, onComplete) {
+    getClient(function (client) {
+        if (client.errorMessage) {
+            if (onComplete) {
+                onComplete(client);
+            }
+            return;
+        }
+        
+        var model = modelBase.model;
+        var params = [];
+        var id = "";
+        var idFieldName = "";
+        for (var fieldInfo in model) {
+            if (model.hasOwnProperty(fieldInfo)) {
+                if (model[fieldInfo].isIdentity) {
+                    id = model[fieldInfo].value;
+                    idFieldName = fieldInfo;
+                    break;
+                }
+            }
+        }
+
+        var queryText = 'DELETE FROM "' + modelBase.tableName + '" WHERE "' + idFieldName + '" = $1';
+        params.push(id);
+
+        client.query(queryText, params, function (err, result) {
+            if (err) {
+                if (onComplete) {
+                    onComplete({ errorMessage : err.message });
+                }
+            } else {
+                if (onComplete) {
+                    onComplete({});
                 }
             }
             
@@ -187,7 +230,7 @@ exports.getById = function (modelBase, onComplete) {
             }
         }
 
-        var queryText = 'SELECT  "' + fields + '" FROM ' + modelBase.tableName + ' WHERE ' + idFieldName + ' = $1';
+        var queryText = 'SELECT  ' + fields + ' FROM "' + modelBase.tableName + '" WHERE ' + idFieldName + ' = $1';
         var params = [model[idFieldName].value];
 
         client.query(queryText, params, function (err, result) {
@@ -197,7 +240,8 @@ exports.getById = function (modelBase, onComplete) {
                 }
             } else {
                 if (onComplete) {
-                    onComplete(result);
+                    var models = dataHelper.getModelsFromTable(modelBase, result.rows);
+                    onComplete(models);
                 }
             }
             
@@ -231,7 +275,7 @@ exports.getAll = function (modelBase, onComplete) {
             }
         }
 
-        var queryText = 'SELECT  ' + fields + " FROM " + modelBase.tableName ;
+        var queryText = 'SELECT  ' + fields + ' FROM "' + modelBase.tableName + '"' ;
         var params = [];
         
         client.query(queryText, params, function (err, result) {
@@ -241,7 +285,8 @@ exports.getAll = function (modelBase, onComplete) {
                 }
             } else {
                 if (onComplete) {
-                    onComplete(result);
+                    var models = dataHelper.getModelsFromTable(modelBase, result.rows);
+                    onComplete(models);
                 }
             }
             

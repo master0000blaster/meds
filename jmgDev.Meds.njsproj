@@ -52,7 +52,7 @@
     <Compile Include="Entity\Data\Models\medicationDosage.js" />
     <Compile Include="Entity\Data\Models\modelBase.js" />
     <Compile Include="Entity\Data\Models\types.js" />
-    <Compile Include="Entity\Helpers\dateHelper.js" />
+    <Compile Include="Entity\Helpers\dataHelper.js" />
     <Compile Include="public\javascripts\angular.min.js" />
     <Compile Include="public\javascripts\Controllers\mainController.js" />
     <Compile Include="public\javascripts\jquery-2.1.4.min.js" />
