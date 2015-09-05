@@ -23,7 +23,9 @@
         <div id="medications">
             Medications
             <div id="divAddMedication">
-                Medication Name: <input type="text" ng-model="addMedText" /><br />
+                Medication Name: <input type="text" ng-model="addMedText" ng-change="getMedSpellingSuggestions(addMedText)" />
+                <span style="padding-left:5px;" ng-repeat="suggestion in spellingSuggestions track by $index">{{suggestion}}</span>
+                <br />
                 <button ng-click="addMed()">Add</button>
             </div>
             <br />

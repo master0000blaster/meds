@@ -8,6 +8,8 @@ app.controller("mainController", function ($scope) {
         };
     }
     
+    var nameSuggestonService = "https://rxnav.nlm.nih.gov/REST/spellingsuggestions.json?";
+    
     $scope.outputLines = [];
     $scope.addMedText = "";
     $scope.meds = [];
@@ -19,21 +21,22 @@ app.controller("mainController", function ($scope) {
     $scope.medDosages = {};
     $scope.editModeMedicationEnabled = {};
     $scope.medDoseUpdateModeEnabled = {};
+    $scope.spellingSuggestions = [];
     
     function Output(text) {
         $scope.outputLines.push(text);
         $scope.$apply();
     }
     
-    function PostSomething(request, onComplete) {
-        
+    function CallSomethingByMethod(url, method, request, onComplete)
+    {
         $.ajax({
-            url: this.href,
-            type: 'POST',
+            url: url, 
+            type: method,
             dataType : 'json',
             data: request,
             success: function (result) {
-                if (result.errorMessage || result.errorMessage != '') {
+                if (result.errorMessage) {
                     console.log(result.errorMessage);
                     if (onComplete) {
                         onComplete(result);
@@ -41,7 +44,7 @@ app.controller("mainController", function ($scope) {
                 }
                 else {
                     if (onComplete) {
-                        var data = result.data ? result.data : {};
+                        var data = result.data ? result.data : result;
                         onComplete(data);
                     }
                 }
@@ -52,6 +55,38 @@ app.controller("mainController", function ($scope) {
                 onComplete({ errorMessage : e.message });
             }
         });
+    }
+    
+    function GetSomething(request, onComplete)
+    {
+        GetSomethingByURL(this.href, request, onComplete);
+    }
+    
+    function GetSomethingByURL(url, request, onComplete) {
+        var queryString = "";
+        for (var prop in request) {
+            if (request.hasOwnProperty(prop)) {
+                if (queryString != "") {
+                    queryString += "&";
+                }
+                queryString += prop + "=" + request[prop];
+            }
+        }
+
+        if (url.lastIndexOf("?") < 0) {
+            url += "?";
+        }
+
+        CallSomethingByMethod(url + queryString, "GET", {}, onComplete);
+    }
+    
+    function PostSomething(request, onComplete) {
+        PostSomethingByUrl(this.href, request, onComplete);
+    }
+    
+    function PostSomethingByUrl(url, request, onComplete)
+    {
+        CallSomethingByMethod(url, "POST", request, onComplete);
     }
     
     function getMedDosagesByMedId(medId) {
@@ -80,6 +115,17 @@ app.controller("mainController", function ($scope) {
             $scope.$apply();
         });
     }
+    
+    $scope.getMedSpellingSuggestions = function (text) {
+        if (text && text.length > 2) {
+            GetSomethingByURL(nameSuggestonService, { "name" : text }, function (results) {
+                $scope.spellingSuggestions = results.suggestionGroup.suggestionList.suggestion;
+            });
+        }
+        else {
+            $scope.spellingSuggestions = [];
+        }
+    };
     
     $scope.updateMedDosge = function (medDose, medId) {
         if ($scope.medDoseUpdateModeEnabled[medId][medDose.id]) {
@@ -179,6 +225,7 @@ app.controller("mainController", function ($scope) {
     };
     
     $scope.addMed = function () {
+        $scope.spellingSuggestions = [];
         var requestModel = createRequest();
         requestModel.entity = "meds";
         requestModel.action = "insertMedication";
