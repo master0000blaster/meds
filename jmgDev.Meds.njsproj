@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{75c92282-8618-434e-9a3a-46fae5dec564}</ProjectGuid>
     <ProjectHome />
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
     <StartupFile>server.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -60,6 +60,8 @@
     <Compile Include="public\javascripts\jquery-ui-1.11.4.custom\jquery-ui.js" />
     <Compile Include="public\javascripts\jquery-ui-1.11.4.custom\jquery-ui.min.js" />
     <Compile Include="public\javascripts\medsApp.js" />
+    <Compile Include="public\javascripts\Services\configService.js" />
+    <Compile Include="public\javascripts\Services\dataService.js" />
     <Compile Include="server.js" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +79,7 @@
     <Folder Include="public\javascripts\jquery-ui-1.11.4.custom\external\jquery\" />
     <Folder Include="public\javascripts\jquery-ui-1.11.4.custom\images\" />
     <Folder Include="public\javascripts\Controllers\" />
+    <Folder Include="public\javascripts\Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
