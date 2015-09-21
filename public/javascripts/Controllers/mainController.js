@@ -1,4 +1,4 @@
-app.controller("mainController", ['configService', 'dataService', function ($scope, configService, dataService) {
+app.controller("mainController", ['$scope', 'configService', 'dataService', function ($scope, configService, dataService) {
         
         
         $scope.outputLines = [];
@@ -12,15 +12,18 @@ app.controller("mainController", ['configService', 'dataService', function ($sco
         $scope.medDosages = {};
         $scope.editModeMedicationEnabled = {};
         $scope.medDoseUpdateModeEnabled = {};
+        $scope.adminDoseUpdateModeEnabled = {};
         $scope.spellingSuggestions = [];
+        $scope.administrations = [];
+        $scope.newAdministrationNotes = '';
+        $scope.editModeAdministrationsEnabled = {};
+        $scope.addAdminDoseEnabled = {};
         
         function Output(text) {
             $scope.outputLines.push(text);
             $scope.$apply();
         }
-        
-        
-        
+
         function getMedDosagesByMedId(medId) {
             
             dataService.meds.getMedDosagesByMedId({
@@ -77,7 +80,7 @@ app.controller("mainController", ['configService', 'dataService', function ($sco
         $scope.deleteMedDosage = function (medDosageId, medId) {
             if (!$scope.medDoseUpdateModeEnabled[medId][medDosageId]) {
                 
-                dataService.meds.deleteDosageMedById({ medDosageId: medDosageId }, function (result) {
+                dataService.meds.deleteDosageMedById( medDosageId , function (result) {
                     if (result.errorMessage) {
                         console.log(result.errorMessage);
                     }
@@ -116,7 +119,7 @@ app.controller("mainController", ['configService', 'dataService', function ($sco
         $scope.addMedDosageDone = function (medId) {
             if ($scope.addMedDosageText[medId] != "" && $scope.addMedDosageText[medId] != undefined) {
                 
-                dataService.meds.addMedDosage({ MedicationId: medId, Dosage : $scope.addMedDosageText[medId] }, function (result) {
+                dataService.meds.addMedDosage({ MedicationId: medId, PillDosage : $scope.addMedDosageText[medId] }, function (result) {
                     if (result.errorMessage) {
                         console.log(result.errorMessage);
                     }
@@ -148,9 +151,7 @@ app.controller("mainController", ['configService', 'dataService', function ($sco
         $scope.deleteMed = function (id) {
             if (!$scope.editModeMedicationEnabled[id]) {
                 
-                dataService.meds.deleteMedById({
-                    medId: id
-                }, function (results) {
+                dataService.meds.deleteMedById(id, function (results) {
                     if (!results.errorMessage) {
                         getAllMeds();
                     }
@@ -164,11 +165,29 @@ app.controller("mainController", ['configService', 'dataService', function ($sco
         var getAllMeds = function () {            
             dataService.meds.getAllMeds({}, function (results) {
                 $scope.editModeMedicationEnabled = {};
+                $scope.addMedDosageShowing = {};
+                $scope.medDoseUpdateModeEnabled = {};
                 for (var m = 0; m < results.length; m++) {
                     $scope.editModeMedicationEnabled[results[m].id] = false;
+                    $scope.addMedDosageShowing[results[m].id] = false;
                 }
                 
                 $scope.meds = results;
+                $scope.$apply();
+            });
+        };
+        
+        var getAllAdministrations = function () {
+            dataService.meds.getAdministrations({}, function (results) {
+                $scope.addAdminDoseEnabled = {};
+                $scope.editModeAdministrationsEnabled = {};
+                $scope.adminDoseUpdateModeEnabled = {};
+                for (var a = 0; a < results.length; a++) {
+                    $scope.editModeAdministrationsEnabled[results[a].id] = false;
+                    $scope.addAdminDoseEnabled[results[a].id] = false;
+                }
+                
+                $scope.administrations = results;
                 $scope.$apply();
             });
         };
@@ -199,10 +218,21 @@ app.controller("mainController", ['configService', 'dataService', function ($sco
             }
         };
         
+        $scope.addAdministrationDose = function () {
+
+        };
+        
+        $scope.addAdministration = function () {            
+            dataService.meds.addAdministration({ Notes : $scope.newAdministrationNotes }, function (data) {
+                getAllAdministrations();
+            });
+        };
+        
         $scope.init = function () {
             dataService.setServiceUrl(configService.serviceUrl);
             
             getAllMeds();
+            getAllAdministrations();
         };
         
         $scope.init();

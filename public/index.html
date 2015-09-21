@@ -17,9 +17,19 @@
             <li><a href="#medications">Medications</a></li>
         </ul>
         <div id="administrations">
-            Administrations
-            <div id="divAddAdministrations">
-
+            <input type="text" ng-model="newAdministrationNotes"/>
+            <button ng-click="addAdministration()">Add Administration</button>
+            <div id="divAddAdministrations" ng-repeat="administration in administrations track by administration.id">
+                Notes: {{administration.notes}} Date Modified: {{administration.DateModified}}
+                <div ng-show="addAdminDoseEnabled[administration.id]" id="divAddAdministration">
+                    MedicationName <input type="text" /> <br/>
+                    PillDosage <input type="number" /><br />
+                    DosageTaken <input type="number" /> <br />
+                    PillsTaken <input type="number" /> <br />
+                    TakenAt <input type="datetime" /> <br />
+                    Notes <input type="text" /> <br />
+                    <button ng-click="addAdministrationDose()">Add Dose</button>
+                </div>
             </div>
         </div>
         <div id="medications">

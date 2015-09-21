@@ -1,0 +1,2 @@
+C:\_root\1dev\jmgDev_Git_Repo\OpenShift\Meds2\meds\obj\Debug\jmgDev.Meds.njsprojResolveAssemblyReference.cache
+C:\_root\1dev\jmgDev_Git_Repo\OpenShift\Meds2\meds\bin\Microsoft.NodejsTools.WebRole.dll

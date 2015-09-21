@@ -47,6 +47,7 @@
     <Compile Include="Entity\Data\medsDatabase.js" />
     <Compile Include="Entity\Data\medsDbManager.js" />
     <Compile Include="Entity\Data\Models\administration.js" />
+    <Compile Include="Entity\Data\Models\administrationDose.js" />
     <Compile Include="Entity\Data\Models\fieldInfo.js" />
     <Compile Include="Entity\Data\Models\medication.js" />
     <Compile Include="Entity\Data\Models\medicationDosage.js" />

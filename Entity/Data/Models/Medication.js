@@ -8,7 +8,8 @@ function create() {
         {
             id : fieldInfo.create(types.number, true),
             Name : fieldInfo.create(types.string),
-            DateModified : fieldInfo.create(types.date, false, true)
+            DateModified : fieldInfo.create(types.date, false, true),
+            Notes : fieldInfo.create(types.string)
         }
     );
 

@@ -7,11 +7,8 @@ function create() {
         'Administrations',
         {
             id : fieldInfo.create(types.number, true),
-            MedicationId : fieldInfo.create(types.number),
-            MedicationDosageId : fieldInfo.create(types.number),
-            DosageTaken : fieldInfo.create(types.number),
-            TakenAt : fieldInfo.create(types.date),
-            DateModified : fieldInfo.create(types.date, false, true)
+            DateModified : fieldInfo.create(types.date, false, true),
+            Notes : fieldInfo.create(types.string)
         }
     );
 }
