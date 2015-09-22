@@ -177,7 +177,7 @@ app.controller("mainController", ['$scope', 'configService', 'dataService', func
             });
         };
         
-        var getAllAdministrations = function () {
+        var getAllAdministrations = function (onComplete) {
             dataService.meds.getAdministrations({}, function (results) {
                 $scope.addAdminDoseEnabled = {};
                 $scope.editModeAdministrationsEnabled = {};
@@ -188,7 +188,13 @@ app.controller("mainController", ['$scope', 'configService', 'dataService', func
                 }
                 
                 $scope.administrations = results;
-                $scope.$apply();
+                
+                if (onComplete) {
+                    onComplete();
+                }
+                else {
+                    $scope.$apply();
+                }
             });
         };
         
@@ -231,8 +237,10 @@ app.controller("mainController", ['$scope', 'configService', 'dataService', func
         $scope.init = function () {
             dataService.setServiceUrl(configService.serviceUrl);
             
-            getAllMeds();
-            getAllAdministrations();
+            getAllAdministrations(function () {
+                getAllMeds();
+            });
+            
         };
         
         $scope.init();

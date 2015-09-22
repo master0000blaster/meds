@@ -123,9 +123,8 @@ exports.deleteAdministration = function (args, onComplete) {
 
 };
 
-exports.getAdministrations = function (administrationFlat, onComplete) {
+exports.getAdministrations = function (onComplete) {
     var model = administration.create();
-    modelBase.fillFromFlat(model, administrationFlat);
     medsDbManager.getAll(model, onComplete);
 };
 
@@ -147,9 +146,8 @@ exports.deleteAdministrationDose = function (administrationDoseFlat, onComplete)
     medsDbManager.deleteById(model, onComplete);
 };
 
-exports.getAdministrationDoses = function (args, onComplete) {
+exports.getAdministrationDoses = function (onComplete) {
     var model = administrationDose.create();
-    model.model.id.value = args.administrationDoseId;
     medsDbManager.getAll(model, onComplete);
 };
 

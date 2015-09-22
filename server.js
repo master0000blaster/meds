@@ -53,8 +53,7 @@ app.post("/", function (request, res) {
         
         if (action && entity) {
             var args = [];
-            if (req.params)
-            {
+            if (req.params) {
                 args.push(req.params);
             }
             
